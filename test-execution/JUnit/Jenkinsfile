@@ -1,4 +1,4 @@
-def agentLabel = "adm"
+def agentLabel = ""
 pipeline{
     agent any
     options {
