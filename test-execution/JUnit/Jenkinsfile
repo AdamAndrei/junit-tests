@@ -15,7 +15,9 @@ pipeline{
     stages {
 
         stage('setTag') {
-
+            agent{
+                label 'adm'
+            }
             steps {
                 dir('test-execution') {
                     bat 'npm install'
