@@ -1,0 +1,48 @@
+variables:
+  TAG: ""
+stages:
+  - set_tag
+  - set_testsToRun
+  - run
+
+set-tag:
+  stage: set_tag
+  script:
+    - cd test-execution
+    - npm install
+    - npm run build
+    - npm run start-init-execution-keywords $suiteId
+    - $TAG = Get-Content .\execution_keywords.txt -Raw
+
+set-testsToRun:
+  stage: set_testsToRun
+  script:
+    - cd test-execution
+    - npm install
+    - npm run build
+    - npm run create-tests-to-run $suiteRunId
+  artifacts:
+    paths:
+      - ./test-execution/testsToRun.txt
+
+run-tests:
+  tags:
+    - $TAG
+  stage: run
+  script:
+    - cd test-execution
+    - npm install
+    - npm run build
+    - echo $CI_PROJECT_DIR
+    - $testsToRun = Get-Content .\testsToRun.txt -Raw
+    - echo $testsToRun
+    - npm run start "$testsToRun" $suiteId $suiteRunId $username $password
+    - echo "running tests... "
+    - Get-Content -Path .\command_to_execute.bat
+    - Start-Process -Wait -FilePath .\command_to_execute.bat
+  artifacts:
+    paths:
+      - .\test-execution\command_to_execute.bat
+      - .\test-execution\testResults\*
+
+
